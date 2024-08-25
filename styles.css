@@ -73,3 +73,11 @@ body{
 .key.operator{
     background-color: lime;
 }
+
+.key.modifier{
+    background-color: cyan;
+}
+
+.key.control{
+    background-color: gray;
+}
