@@ -34,14 +34,40 @@ const operatorTable = {
     "divide" : divide
 }
 
+function getFloatingPointPrecision(operand){
+    if(operand.includes(".")){
+        return operand.length - operand.indexOf(".") -1;
+    }
+    else {
+        return 0;
+    }
+}
+
+function getResultPrecision(){
+    let primaryPrecision = getFloatingPointPrecision(operands.primary);
+    let secondaryPrecision = getFloatingPointPrecision(operands.secondary);
+    let resultPrecision = 100; // yes, a "magic" number, the maximum value we can pass to toFixed();
+    switch (operator){
+        case "plus":
+        case "minus":
+            resultPrecision = Math.max(primaryPrecision,secondaryPrecision);
+            break;
+        case "multiply":
+            resultPrecision = primaryPrecision + secondaryPrecision;
+    }
+    resultPrecision = Math.min(resultPrecision,100);
+    return resultPrecision;
+}
+
 function operate(){
+    const resultPrecision = getResultPrecision();
     const result = operatorTable[operator](Number(operands.primary), Number(operands.secondary));
-    console.log(`operated, result: ${result}`);
-    operands["primary"] = result;
     operands["secondary"] = "";
     currentOperandType = "primary";
-    currentOperand = String(result);
-    display(result);
+    currentOperand = result.toFixed(resultPrecision);
+    currentOperand = currentOperand.substring(0, 15);
+    operands["primary"] = currentOperand;
+    display(currentOperand);
 }
 
 
@@ -119,17 +145,6 @@ function processOperator(op){
         }
     }
     else{
-        /*
-        if(currentOperandType === "primary"){
-            operator = op;
-            currentOperand = "";
-            currentOperandType = "secondary"; 
-        }
-        else {
-            operate();
-            isResultDisplayed = false;
-        }
-        */
         if(currentOperandType === "secondary"){
             operate();
             isResultDisplayed = false;
