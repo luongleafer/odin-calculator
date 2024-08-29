@@ -31,9 +31,8 @@ body{
     background-color: #e6e6e6;
     flex-shrink: 0;
     
-
     font-size: 4rem;
-
+    
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
@@ -85,4 +84,9 @@ body{
 
 .key.control{
     background-color: gray;
+}
+
+.key:hover{
+    background-color: orange;
+    cursor: pointer;
 }

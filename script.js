@@ -168,6 +168,7 @@ function processOperator(op){
             isResultDisplayed = false;
         }
     }
+    highlightOperator(op);
 }
 
 function display(thing){
@@ -175,4 +176,14 @@ function display(thing){
         thing = "0";
     }
     screen.innerText = String(thing);
+}
+
+function highlightOperator(op){
+    const allOpDiv = document.querySelectorAll(".key.operator");
+    allOpDiv.forEach((div) => div.style.backgroundColor = ""  );
+    if(op === "equal") return;
+    const opDiv = document.querySelector(`.key.operator#${op}`);
+    opDiv.style.backgroundColor = "orange";
+
+    
 }
