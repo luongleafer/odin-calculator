@@ -59,9 +59,20 @@ function getResultPrecision(){
     return resultPrecision;
 }
 
+function processPercent(operand){
+    let percentIter = operand.length - 1;
+    while(operand.charAt(percentIter) === "%"){
+        percentIter--;
+    }
+    const number = Number(operand.substring(0,percentIter+1));
+    return number / Math.pow(100,operand.length - 1 - percentIter);
+}
+
 function operate(){
+    operands.primary = String(processPercent(operands.primary));
+    operands.secondary = String(processPercent(operands.secondary));
     const resultPrecision = getResultPrecision();
-    const result = operatorTable[operator](Number(operands.primary), Number(operands.secondary));
+    const result = operatorTable[operator](Number(operands.primary),Number(operands.secondary));
     operands["secondary"] = "";
     currentOperandType = "primary";
     currentOperand = result.toFixed(resultPrecision);
@@ -100,6 +111,7 @@ function processKey(keytype, keyId){
 }
 
 function processNumberKey(number){
+    if(currentOperand.endsWith("%")) return; // you can't add digit after a percent symbol (%)
     if(isResultDisplayed){
         currentOperandType = "primary";
         isResultDisplayed = false;
