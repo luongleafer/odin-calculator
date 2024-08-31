@@ -55,7 +55,7 @@ function getResultPrecision(){
         case "multiply":
             resultPrecision = primaryPrecision + secondaryPrecision;
     }
-    resultPrecision = Math.min(resultPrecision,100);
+    resultPrecision = Math.min(resultPrecision,15);
     return resultPrecision;
 }
 
@@ -72,11 +72,15 @@ function operate(){
     operands.primary = String(processPercent(operands.primary));
     operands.secondary = String(processPercent(operands.secondary));
     const resultPrecision = getResultPrecision();
+    console.log(Number(operands.primary), Number(operands.secondary));
     const result = operatorTable[operator](Number(operands.primary),Number(operands.secondary));
     operands["secondary"] = "";
     currentOperandType = "primary";
     currentOperand = result.toFixed(resultPrecision);
     currentOperand = currentOperand.substring(0, 15);
+    if(currentOperand.includes(".")){
+        currentOperand =  currentOperand.replace(/\.?0*$/gm,'');
+    }
     operands["primary"] = currentOperand;
     display(currentOperand);
 }
