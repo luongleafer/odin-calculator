@@ -11,6 +11,7 @@ let operands = {
     "secondary" : ""
 }
 
+
 const add = (primary, secondary) => {
     return primary + secondary;
 }
@@ -72,17 +73,23 @@ function operate(){
     operands.primary = String(processPercent(operands.primary));
     operands.secondary = String(processPercent(operands.secondary));
     const resultPrecision = getResultPrecision();
-    console.log(Number(operands.primary), Number(operands.secondary));
     const result = operatorTable[operator](Number(operands.primary),Number(operands.secondary));
+
     operands["secondary"] = "";
     currentOperandType = "primary";
-    currentOperand = result.toFixed(resultPrecision);
-    currentOperand = currentOperand.substring(0, 15);
-    if(currentOperand.includes(".")){
-        currentOperand =  currentOperand.replace(/\.?0*$/gm,'');
+    
+    if(isNaN(result) || !isFinite(result)){
+        reset("ERROR. Press AC");
     }
-    operands["primary"] = currentOperand;
-    display(currentOperand);
+    else{
+        currentOperand = result.toFixed(resultPrecision);
+        currentOperand = currentOperand.substring(0, 15);
+        if(currentOperand.includes(".")){
+        currentOperand =  currentOperand.replace(/\.?0*$/gm,'');
+        }
+        operands["primary"] = currentOperand;
+        display(currentOperand);
+    }
 }
 
 
@@ -92,6 +99,33 @@ keyboard.addEventListener("click", (event) => {
         processKey(event.target.classList[1],event.target.id);
     }
 } );
+
+document.addEventListener("keydown", (event) => {
+    processPhysicalKeyboard(event.key);
+})
+
+function processPhysicalKeyboard(key){
+    const mapping = {
+        "+" : {type: "operator", id: "plus"},
+        "-" : {type: "operator", id: "minus"},
+        "*" : {type: "operator", id: "multiply"},
+        "/" : {type: "operator", id: "divide"},
+        "=" : {type: "operator", id: "equal"},
+        "Enter" : {type: "operator", id: "equal"},
+        "Backspace" : {type: "modifier", id: "delete"},
+        "." : {type: "modifier", id: "floating-point"},
+        "%" : {type: "modifier", id: "percent"},
+    }
+    if("0123456789".includes(key)){
+        processKey("number",key);
+    }
+    else {
+        if(mapping.hasOwnProperty(key)){
+            const mappingResult = mapping[key];
+            processKey(mappingResult.type,mappingResult.id);
+        }
+    }
+}
 
 function processKey(keytype, keyId){
     switch (keytype){
@@ -105,11 +139,7 @@ function processKey(keytype, keyId){
             processOperator(keyId);
             break;
         case "control":
-            currentOperand = "";
-            operands["primary"] = "";
-            operands["secondary"] = "";
-            operator = "";
-            display("0");
+            reset("0");            
             break;
     }
 }
@@ -185,9 +215,19 @@ function display(thing){
 function highlightOperator(op){
     const allOpDiv = document.querySelectorAll(".key.operator");
     allOpDiv.forEach((div) => div.style.backgroundColor = ""  );
-    if(op === "equal") return;
+    if(op === "" || op === "equal") return;
     const opDiv = document.querySelector(`.key.operator#${op}`);
     opDiv.style.backgroundColor = "orange";
 
     
+}
+
+function reset(msg){
+    currentOperand = "";
+    currentOperandType = "primary"
+    operands["primary"] = "";
+    operands["secondary"] = "";
+    operator = "";
+    display(msg);
+    highlightOperator("");
 }
